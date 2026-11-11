@@ -1,3 +1,5 @@
+# code written with the assistance of co-pilot, each step clearly explained and results verified
+
 import numpy as np
 
 # calculate the Hurst exponent of a time series using the R/S method.
@@ -11,13 +13,7 @@ def hurst_exponent(data):
     max_window = n // 2
     min_window = 10
     
-    # Build ~20 log-spaced window sizes so the regression samples scales
-    # uniformly in log-space (not linear space), which matches the power law
-    # R/S ~ n^H we are trying to fit. np.unique removes any duplicate
-    # integers that can appear after astype(int) at small sizes.
-    window_sizes = np.unique(
-        np.logspace(np.log10(min_window), np.log10(max_window), num=20).astype(int)
-    )
+    window_sizes = np.logspace(np.log10(min_window), np.log10(max_window), num=20).astype(int)
     
     rs_values = []    # mean R/S value per window size
     valid_sizes = []  # corresponding window sizes that produced a valid R/S
@@ -25,8 +21,6 @@ def hurst_exponent(data):
     # For each window size w, split the series into non-overlapping chunks of length w and compute the rescaled range for each chunk.
     for w in window_sizes:
         n_windows = n // w  # number of complete, non-overlapping windows
-        if n_windows < 1:
-            continue        # window larger than the series; skip
         
         rs_list = []        # R/S values for all windows of this size
         for i in range(n_windows):
@@ -36,19 +30,17 @@ def hurst_exponent(data):
             mean = np.mean(window)
             dev = window - mean
             
-            # build the cumulative deviation series (the "profile")
+            # build the profile of the series
             cumulative = np.cumsum(dev)
             
             # range R = max - min of the cumulative deviation
             R = np.max(cumulative) - np.min(cumulative)
             
             # standard deviation S of the original (detrended) window
-            # ddof=0 -> population std, consistent with classic R/S
             S = np.std(window, ddof=0)
             
-            # rescale: only add if S > 0 (flat windows give 0/0)
-            if S > 0:
-                rs_list.append(R / S)
+            # rescale
+            rs_list.append(R / S)
         
         # average the R/S values across all windows of this size.
         # averaging over multiple windows reduces variance of the estimate.
