@@ -1,3 +1,5 @@
+# AI acknowledgement: code structured with the assistance of co-pilot, but all equations pulled from the source material with reasoning explained
+
 import numpy as np
 
 # calculate the Hurst exponent of a time series using the R/S method.
